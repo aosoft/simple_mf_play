@@ -37,6 +37,7 @@ enum PlayerState {
     Closing,
 }
 
+#[windows::core::implement(IMFAsyncCallback)]
 struct Player {
     session: IMFMediaSession,
     source: IMFMediaSource,
@@ -69,26 +70,26 @@ impl Player {
             let sourceStreams = sourcePd.GetStreamDescriptorCount()?;
             for i in 0..sourceStreams {
                 let mut sourceSd: Option<IMFStreamDescriptor> = None;
-                let mut selected: BOOL;
+                let mut selected: BOOL = Default::default();
                 sourcePd.GetStreamDescriptorByIndex(i, &mut selected, &mut sourceSd)?;
                 let sourceSd = sourceSd.unwrap();
                 if selected.as_bool() {
                     let sourceNode = MFCreateTopologyNode(MF_TOPOLOGY_SOURCESTREAM_NODE)?;
                     sourceNode.SetUnknown(&MF_TOPONODE_SOURCE, &mediaSource)?;
                     sourceNode.SetUnknown(&MF_TOPONODE_PRESENTATION_DESCRIPTOR, &sourcePd)?;
-                    sourceNode.SetUnknown(&MF_TOPONODE_STREAM_DESCRIPTOR, &sourcesd)?;
+                    sourceNode.SetUnknown(&MF_TOPONODE_STREAM_DESCRIPTOR, &sourceSd)?;
 
                     let streamId = sourceSd.GetStreamIdentifier()?;
                     let mediaTypeHandler = sourceSd.GetMediaTypeHandler()?;
                     let majorType = mediaTypeHandler.GetMajorType()?;
                     let outputNode = MFCreateTopologyNode(MF_TOPOLOGY_OUTPUT_NODE)?;
                     if majorType == MFMediaType_Audio {
-                        outputNode.SetObject(MFCreateAudioRendererActivate()?)?;
+                        outputNode.SetObject(&MFCreateAudioRendererActivate()?)?;
                     } else if majorType == MFMediaType_Video {
-                        outputNode.SetObject(MFCreateVideoRendererActivate(hwndVideo)?)?;
+                        outputNode.SetObject(&MFCreateVideoRendererActivate(hwndVideo)?)?;
                     }
-                    topology.AddNode(sourceNode)?;
-                    topology.AddNode(outputNode)?;
+                    topology.AddNode(&sourceNode)?;
+                    topology.AddNode(&outputNode)?;
                     sourceNode.ConnectOutput(0, &outputNode, 0)?;
                 }
             }
@@ -105,5 +106,14 @@ impl Player {
                 closeEvent,
             })
         }
+    }
+}
+
+impl IMFAsyncCallback_Impl for Player {
+    fn GetParameters(&self, _: *mut u32, _: *mut u32) -> Result<(), windows::core::Error> {
+        todo!()
+    }
+    fn Invoke(&self, _: Option<&IMFAsyncResult>) -> Result<(), windows::core::Error> {
+        todo!()
     }
 }

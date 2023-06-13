@@ -13,11 +13,13 @@ winit = "0.28.6"
 version = "0.48.0"
 
 features = [
+    "implement",
     "Win32_Foundation",
     "Win32_Media",
     "Win32_Media_Multimedia",
     "Win32_Media_MediaFoundation",
     "Win32_UI_Shell_PropertiesSystem",
+    "Win32_System_Com",
 ]
 
 
