@@ -1,8 +1,8 @@
 use std::ffi::{OsStr, OsString};
-use std::ptr::{null, null_mut};
+use std::ptr::{NonNull, null, null_mut};
 use windows::core::{ComInterface, IUnknown, HRESULT, HSTRING, PCWSTR, PWSTR};
-use windows::imp::CreateEventW;
-use windows::Win32::Foundation::{BOOL, FALSE, HANDLE, HWND, S_OK};
+use windows::imp::{CreateEventW, SetEvent};
+use windows::Win32::Foundation::{BOOL, E_NOTIMPL, FALSE, HANDLE, HWND, S_OK};
 use windows::Win32::Media::MediaFoundation::*;
 use windows::Win32::UI::Shell::PropertiesSystem::IPropertyStore;
 
@@ -109,11 +109,21 @@ impl Player {
     }
 }
 
+
 impl IMFAsyncCallback_Impl for Player {
     fn GetParameters(&self, _: *mut u32, _: *mut u32) -> Result<(), windows::core::Error> {
-        todo!()
+        Err(windows::core::Error::from(E_NOTIMPL))
     }
-    fn Invoke(&self, _: Option<&IMFAsyncResult>) -> Result<(), windows::core::Error> {
-        todo!()
+    fn Invoke(&self, result: Option<&IMFAsyncResult>) -> Result<(), windows::core::Error> {
+        unsafe {
+            let event = self.session.EndGetEvent(result)?;
+            let meType = MF_EVENT_TYPE(event.GetType()? as i32);
+            if (meType == MESessionClosed) {
+                SetEvent(self.closeEvent);
+            } else {
+                self.session.BeginGetEvent(&self.cast::<IMFAsyncCallback>()?, None)?;
+            }
+            Ok(())
+        }
     }
 }
