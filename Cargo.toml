@@ -20,7 +20,13 @@ features = [
     "Win32_Media_MediaFoundation",
     "Win32_UI_Shell_PropertiesSystem",
     "Win32_System_Com",
+    "Win32_System_Com_StructuredStorage"
 ]
+
+[build-dependencies]
+
+cmake = "0.1.50"
+bindgen = "0.65.1"
 
 
 

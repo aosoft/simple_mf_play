@@ -1,10 +1,13 @@
+use std::env::var;
 use std::ffi::{OsStr, OsString};
 use std::ptr::{NonNull, null, null_mut};
 use windows::core::{ComInterface, IUnknown, HRESULT, HSTRING, PCWSTR, PWSTR};
 use windows::imp::{CreateEventW, SetEvent};
 use windows::Win32::Foundation::{BOOL, E_NOTIMPL, FALSE, HANDLE, HWND, S_OK};
 use windows::Win32::Media::MediaFoundation::*;
-use windows::Win32::UI::Shell::PropertiesSystem::IPropertyStore;
+use windows::Win32::System::Com::StructuredStorage::{PROPVARIANT, PropVariantClear};
+use windows::Win32::System::Com::VT_EMPTY;
+use windows::Win32::UI::Shell::PropertiesSystem::{IPropertyStore, PropVariantToInt16};
 
 struct MFInitializer();
 
@@ -102,7 +105,7 @@ impl Player {
                 videoDisplay: None,
                 hwndVideo,
                 hwndEvent,
-                state: PlayerState::Closed,
+                state: PlayerState::OpenPending,
                 closeEvent,
             })
         }
