@@ -1,11 +1,17 @@
 #pragma once
 
 #include <windows.h>
-#include <comdef.h>
-#include <mfapi.h>
-#include <mfobjects.h>
-#include <mfidl.h>
-#include <mferror.h>
+#include <cstdint>
 
-template<class Intf>
-using com_ptr = _com_ptr_t<_com_IIID<Intf, &__uuidof(Intf)>>;
+enum class player_state : std::int32_t {
+    closed = 0,
+    ready,
+    open_pending,
+    started,
+    paused,
+    stopped,
+    closing,
+};
+
+class mfplay {
+};
