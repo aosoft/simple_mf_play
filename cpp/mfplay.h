@@ -13,5 +13,5 @@ enum class player_state : std::int32_t {
     closing,
 };
 
-class mfplay {
+class mfplay : public IUnknown {
 };
