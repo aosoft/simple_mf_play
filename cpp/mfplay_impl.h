@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "mfplay.h"
+#include "safe_queue.h"
 
 #include <atomic>
 
@@ -50,4 +51,8 @@ public:
 
     virtual HRESULT STDMETHODCALLTYPE Invoke(
         /* [in] */ __RPC__in_opt IMFAsyncResult* pAsyncResult) override;
+
+public:
+    virtual HRESULT STDMETHODCALLTYPE play() override;
+    virtual HRESULT STDMETHODCALLTYPE pause() override;
 };

@@ -161,3 +161,27 @@ HRESULT STDMETHODCALLTYPE mfplay_impl::Invoke(
 
     return S_OK;
 }
+
+HRESULT mfplay_impl::play()
+{
+    if (_state == player_state::paused || _state == player_state::stopped) {
+        PROPVARIANT varStart;
+        PropVariantInit(&varStart);
+
+        varStart.vt = VT_EMPTY;
+        HRESULT hr = _session->Start(&GUID_NULL, &varStart);
+        PropVariantClear(&varStart);
+        CHECK_HR(hr);
+        _state = player_state::started;
+    }
+    return S_OK;
+}
+
+HRESULT mfplay_impl::pause()
+{
+    if (_state == player_state::started) {
+        CHECK_HR(_session->Pause());
+        _state = player_state::paused;
+    }
+    return S_OK;
+}
