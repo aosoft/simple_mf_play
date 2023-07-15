@@ -5,7 +5,7 @@ mfplay_impl::mfplay_impl()
 {
 }
 
-HRESULT mfplay_impl::initialize(const wchar_t* url)
+HRESULT mfplay_impl::initialize(const wchar_t* url, HWND hwnd_video)
 {
     HRESULT hr = S_OK;
 
@@ -44,7 +44,25 @@ HRESULT mfplay_impl::initialize(const wchar_t* url)
             CHECK_HR(source_node->SetUnknown(MF_TOPONODE_PRESENTATION_DESCRIPTOR, source_pd));
             CHECK_HR(source_node->SetUnknown(MF_TOPONODE_STREAM_DESCRIPTOR, source_sd));
 
+            com_ptr<IMFMediaTypeHandler> handler;
+            com_ptr<IMFActivate> renderer_activate;
+            GUID major_type;
+
+            CHECK_HR(source_sd->GetMediaTypeHandler(&handler));
+            CHECK_HR(handler->GetMajorType(&major_type));
             CHECK_HR(MFCreateTopologyNode(MF_TOPOLOGY_OUTPUT_NODE, &output_node));
+            if (major_type == MFMediaType_Audio) {
+                CHECK_HR(MFCreateAudioRendererActivate(&renderer_activate));
+            } else if (major_type == MFMediaType_Video) {
+                CHECK_HR(MFCreateVideoRendererActivate(hwnd_video, &renderer_activate));
+            } else {
+                return E_FAIL;
+            }
+            CHECK_HR(output_node->SetObject(renderer_activate));
+
+            CHECK_HR(topology->AddNode(source_node));
+            CHECK_HR(topology->AddNode(output_node));
+            CHECK_HR(source_node->ConnectOutput(0, output_node, 0));
         }
     }
 
@@ -67,13 +85,13 @@ mfplay_impl::~mfplay_impl()
     }
 }
 
-HRESULT mfplay_impl::create_instance(const wchar_t* url, mfplay** ret)
+HRESULT mfplay_impl::create_instance(const wchar_t* url, HWND hwnd_video, mfplay** ret)
 try {
     CHECK_POINTER(url);
     CHECK_POINTER(ret);
     auto p = new mfplay_impl();
     auto p2 = com_ptr<mfplay>(p);
-    CHECK_HR(p->initialize(url));
+    CHECK_HR(p->initialize(url, hwnd_video));
     CHECK_HR(p->QueryInterface(IID_PPV_ARGS(ret)));
     return S_OK;
 } catch (const std::bad_alloc&) {
