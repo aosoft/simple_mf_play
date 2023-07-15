@@ -25,7 +25,12 @@ private:
 
 private:
     mfplay_impl();
-    HRESULT initialize();
+    HRESULT initialize(const wchar_t* url);
+
+public:
+    virtual ~mfplay_impl();
+    static HRESULT create_instance(const wchar_t* url, mfplay** ret);
+
 
 public:
     virtual HRESULT STDMETHODCALLTYPE QueryInterface(
