@@ -1,11 +1,13 @@
 #include "mfplay_impl.h"
 #include <exception>
 
-mfplay_impl::mfplay_impl()
+mfplay_impl::mfplay_impl(HWND hwnd_event)
+    : _hwnd_event(hwnd_event)
+    , _state(player_state::closed)
 {
 }
 
-HRESULT mfplay_impl::initialize(const wchar_t* url, HWND hwnd_video)
+HRESULT mfplay_impl::initialize(const wchar_t* url, HWND hwnd_video, HWND hwnd_event)
 {
     HRESULT hr = S_OK;
 
@@ -65,6 +67,8 @@ HRESULT mfplay_impl::initialize(const wchar_t* url, HWND hwnd_video)
             CHECK_HR(source_node->ConnectOutput(0, output_node, 0));
         }
     }
+    CHECK_HR(_session->SetTopology(0, topology));
+    _state = player_state::open_pending;
 
     return S_OK;
 }
@@ -85,11 +89,11 @@ mfplay_impl::~mfplay_impl()
     }
 }
 
-HRESULT mfplay_impl::create_instance(const wchar_t* url, HWND hwnd_video, mfplay** ret)
+HRESULT mfplay_impl::create_instance(const wchar_t* url, HWND hwnd_video, HWND hwnd_event, mfplay** ret)
 try {
     CHECK_POINTER(url);
     CHECK_POINTER(ret);
-    auto p = new mfplay_impl();
+    auto p = new mfplay_impl(hwnd_event);
     auto p2 = com_ptr<mfplay>(p);
     CHECK_HR(p->initialize(url, hwnd_video));
     CHECK_HR(p->QueryInterface(IID_PPV_ARGS(ret)));
@@ -127,4 +131,33 @@ ULONG STDMETHODCALLTYPE mfplay_impl::Release(void)
         _shared_this = nullptr;
     }
     return count;
+}
+
+HRESULT STDMETHODCALLTYPE mfplay_impl::GetParameters(
+    /* [out] */ __RPC__out DWORD* pdwFlags,
+    /* [out] */ __RPC__out DWORD* pdwQueue)
+{
+    return E_NOTIMPL;
+}
+
+HRESULT STDMETHODCALLTYPE mfplay_impl::Invoke(
+    /* [in] */ __RPC__in_opt IMFAsyncResult* pAsyncResult)
+{
+    MediaEventType event_type = MEUnknown; // Event type
+    com_ptr<IMFMediaEvent> event;
+
+    CHECK_HR(_session->EndGetEvent(pAsyncResult, &event));
+    CHECK_HR(event->GetType(&event_type));
+    if (event_type == MESessionClosed) {
+        SetEvent(_close_event.get());
+    } else {
+        CHECK_HR(_session->BeginGetEvent(this, nullptr));
+    }
+
+    if (_state != player_state::closing) {
+        event.AddRef();
+        PostMessageW(_hwnd_event, WM_APP_PLAYER_EVENT, reinterpret_cast<IUnknown*>(event), 0);
+    }
+
+    return S_OK;
 }
