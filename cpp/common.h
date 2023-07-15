@@ -1,10 +1,10 @@
 #pragma once
 
-#include <comdef.h>
+#include <wrl/client.h>
 #include <memory>
 
 template <class Intf>
-using com_ptr = _com_ptr_t<_com_IIID<Intf, &__uuidof(Intf)>>;
+using com_ptr = Microsoft::WRL::ComPtr<Intf>;
 
 #define CHECK_HR(hr)         \
     {                        \

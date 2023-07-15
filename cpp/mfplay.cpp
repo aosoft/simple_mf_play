@@ -27,7 +27,7 @@ HRESULT mfplay_impl::initialize(const wchar_t* url, HWND hwnd_video, HWND hwnd_e
     CHECK_HR(MFCreateSourceResolver(&source_resolver));
     CHECK_HR(source_resolver->CreateObjectFromURL(
         url, MF_RESOLUTION_MEDIASOURCE, nullptr, &object_type, &source));
-    CHECK_HR(source.QueryInterface(IID_PPV_ARGS(&_source)));
+    CHECK_HR(source.As(&_source));
 
     CHECK_HR(MFCreateTopology(&topology));
     CHECK_HR(_source->CreatePresentationDescriptor(&source_pd));
@@ -42,9 +42,9 @@ HRESULT mfplay_impl::initialize(const wchar_t* url, HWND hwnd_video, HWND hwnd_e
         CHECK_HR(source_pd->GetStreamDescriptorByIndex(i, &selected, &source_sd));
         if (selected) {
             CHECK_HR(MFCreateTopologyNode(MF_TOPOLOGY_SOURCESTREAM_NODE, &source_node));
-            CHECK_HR(source_node->SetUnknown(MF_TOPONODE_SOURCE, _source));
-            CHECK_HR(source_node->SetUnknown(MF_TOPONODE_PRESENTATION_DESCRIPTOR, source_pd));
-            CHECK_HR(source_node->SetUnknown(MF_TOPONODE_STREAM_DESCRIPTOR, source_sd));
+            CHECK_HR(source_node->SetUnknown(MF_TOPONODE_SOURCE, _source.Get()));
+            CHECK_HR(source_node->SetUnknown(MF_TOPONODE_PRESENTATION_DESCRIPTOR, source_pd.Get()));
+            CHECK_HR(source_node->SetUnknown(MF_TOPONODE_STREAM_DESCRIPTOR, source_sd.Get()));
 
             com_ptr<IMFMediaTypeHandler> handler;
             com_ptr<IMFActivate> renderer_activate;
@@ -60,14 +60,14 @@ HRESULT mfplay_impl::initialize(const wchar_t* url, HWND hwnd_video, HWND hwnd_e
             } else {
                 return E_FAIL;
             }
-            CHECK_HR(output_node->SetObject(renderer_activate));
+            CHECK_HR(output_node->SetObject(renderer_activate.Get()));
 
-            CHECK_HR(topology->AddNode(source_node));
-            CHECK_HR(topology->AddNode(output_node));
-            CHECK_HR(source_node->ConnectOutput(0, output_node, 0));
+            CHECK_HR(topology->AddNode(source_node.Get()));
+            CHECK_HR(topology->AddNode(output_node.Get()));
+            CHECK_HR(source_node->ConnectOutput(0, output_node.Get(), 0));
         }
     }
-    CHECK_HR(_session->SetTopology(0, topology));
+    CHECK_HR(_session->SetTopology(0, topology.Get()));
     _state = player_state::open_pending;
 
     return S_OK;
@@ -95,7 +95,7 @@ try {
     CHECK_POINTER(ret);
     auto p = new mfplay_impl(hwnd_event);
     auto p2 = com_ptr<mfplay>(p);
-    CHECK_HR(p->initialize(url, hwnd_video));
+    CHECK_HR(p->initialize(url, hwnd_video, hwnd_event));
     CHECK_HR(p->QueryInterface(IID_PPV_ARGS(ret)));
     return S_OK;
 } catch (const std::bad_alloc&) {
@@ -155,8 +155,8 @@ HRESULT STDMETHODCALLTYPE mfplay_impl::Invoke(
     }
 
     if (_state != player_state::closing) {
-        event.AddRef();
-        PostMessageW(_hwnd_event, WM_APP_PLAYER_EVENT, reinterpret_cast<IUnknown*>(event), 0);
+        event->AddRef();
+        PostMessageW(_hwnd_event, WM_APP_PLAYER_EVENT, reinterpret_cast<WPARAM>(event.Get()), 0);
     }
 
     return S_OK;

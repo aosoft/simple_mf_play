@@ -5,7 +5,6 @@
 
 #include <atomic>
 
-#include <comdef.h>
 #include <evr.h>
 #include <mfapi.h>
 #include <mferror.h>
