@@ -6,6 +6,10 @@
 #include <wrl/client.h>
 #include <memory>
 
+#include <atlbase.h>
+extern ATL::CAtlWinModule _Module;
+#include <atlwin.h>
+
 template <class Intf>
 using com_ptr = Microsoft::WRL::ComPtr<Intf>;
 

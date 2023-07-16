@@ -2,7 +2,6 @@
 
 #include "common.h"
 #include "mfplay.h"
-#include "safe_queue.h"
 
 #include <atomic>
 
@@ -12,10 +11,6 @@
 #include <mfidl.h>
 #include <mfobjects.h>
 #include <windows.h>
-
-#include <atlbase.h>
-extern ATL::CAtlWinModule _Module;
-#include <atlwin.h>
 
 class mfplay_impl : public mfplay,
                     public IMFAsyncCallback,
