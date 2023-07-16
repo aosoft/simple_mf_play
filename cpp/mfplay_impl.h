@@ -13,6 +13,10 @@
 #include <mfobjects.h>
 #include <windows.h>
 
+#include <atlbase.h>
+extern ATL::CAtlWinModule _Module;
+#include <atlwin.h>
+
 class mfplay_impl : public mfplay,
                     public IMFAsyncCallback,
                     public std::enable_shared_from_this<mfplay_impl> {

@@ -1,5 +1,8 @@
 #pragma once
 
+#define WIN32_LEAN_AND_MEAN
+#define _ATL_NO_AUTOMATIC_NAMESPACE
+
 #include <wrl/client.h>
 #include <memory>
 
