@@ -18,7 +18,7 @@ public:
     window_message_queue();
     ~window_message_queue();
 
-    void attach(HWND hwnd);
+    bool attach(HWND hwnd);
     void detach();
     void push(std::function<void()> fn);
 

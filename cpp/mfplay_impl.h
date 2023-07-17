@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "mfplay.h"
+#include "window_message_queue.h"
 
 #include <atomic>
 
@@ -10,7 +11,6 @@
 #include <mferror.h>
 #include <mfidl.h>
 #include <mfobjects.h>
-#include <windows.h>
 
 class mfplay_impl : public mfplay,
                     public IMFAsyncCallback,
@@ -21,6 +21,7 @@ private:
 
     player_state _state;
     HWND _hwnd_event;
+    window_message_queue _queue;
     com_ptr<IMFMediaSession> _session;
     com_ptr<IMFMediaSource> _source;
     com_ptr<IMFVideoDisplayControl> _video_display;
@@ -50,6 +51,9 @@ public:
 
     virtual HRESULT STDMETHODCALLTYPE Invoke(
         /* [in] */ __RPC__in_opt IMFAsyncResult* pAsyncResult) override;
+
+private:
+    static void on_event_callback(std::weak_ptr<mfplay_impl> self, com_ptr<IMFMediaEvent> event);
 
 public:
     virtual HRESULT STDMETHODCALLTYPE play() override;

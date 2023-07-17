@@ -94,6 +94,9 @@ try {
     CHECK_POINTER(url);
     CHECK_POINTER(ret);
     auto p = new mfplay_impl(hwnd_event);
+    if (!p->_queue.attach(hwnd_event)) {
+        return E_FAIL;
+    }
     auto p2 = com_ptr<mfplay>(p);
     CHECK_HR(p->initialize(url, hwnd_video, hwnd_event));
     CHECK_HR(p->QueryInterface(IID_PPV_ARGS(ret)));
@@ -155,11 +158,18 @@ HRESULT STDMETHODCALLTYPE mfplay_impl::Invoke(
     }
 
     if (_state != player_state::closing) {
-        event->AddRef();
-        PostMessageW(_hwnd_event, WM_APP_PLAYER_EVENT, reinterpret_cast<WPARAM>(event.Get()), 0);
+        _queue.push(std::bind(on_event_callback, weak_from_this(), event));
     }
 
     return S_OK;
+}
+
+void mfplay_impl::on_event_callback(std::weak_ptr<mfplay_impl> self, com_ptr<IMFMediaEvent> event)
+{
+    auto self2 = self.lock();
+    if (self2 == nullptr) {
+        return;
+    }
 }
 
 HRESULT mfplay_impl::play()
