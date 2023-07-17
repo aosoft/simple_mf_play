@@ -28,11 +28,11 @@ private:
 
 private:
     mfplay_impl();
-    HRESULT initialize(const wchar_t* url, HWND hwnd_video, HWND hwnd_event);
+    HRESULT initialize(const wchar_t* url, HWND hwnd_video);
 
 public:
     virtual ~mfplay_impl();
-    static HRESULT create_instance(const wchar_t* url, HWND hwnd_video, HWND hwnd_event, mfplay** ret);
+    static HRESULT create_instance(const wchar_t* url, HWND hwnd_video, mfplay** ret);
 
 public:
     virtual HRESULT STDMETHODCALLTYPE QueryInterface(

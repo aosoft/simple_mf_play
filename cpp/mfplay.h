@@ -23,6 +23,7 @@ public:
 
 extern "C" {
 
-HRESULT __declspec(dllexport) mfplay_initialize();
-HRESULT __declspec(dllexport) mfplay_finalize();
+HRESULT __declspec(dllexport) STDMETHODCALLTYPE mfplay_initialize();
+HRESULT __declspec(dllexport) STDMETHODCALLTYPE mfplay_finalize();
+HRESULT __declspec(dllexport) STDMETHODCALLTYPE create_mfplay(const wchar_t* url, HWND hwnd_video, mfplay **ret);
 }

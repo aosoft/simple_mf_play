@@ -6,11 +6,11 @@ mfplay_impl::mfplay_impl()
 {
 }
 
-HRESULT mfplay_impl::initialize(const wchar_t* url, HWND hwnd_video, HWND hwnd_event)
+HRESULT mfplay_impl::initialize(const wchar_t* url, HWND hwnd_video)
 {
     HRESULT hr = S_OK;
 
-    if (!_queue.attach(hwnd_event)) {
+    if (!_queue.attach(hwnd_video)) {
         return E_FAIL;
     }
 
@@ -92,13 +92,13 @@ mfplay_impl::~mfplay_impl()
     }
 }
 
-HRESULT mfplay_impl::create_instance(const wchar_t* url, HWND hwnd_video, HWND hwnd_event, mfplay** ret)
+HRESULT mfplay_impl::create_instance(const wchar_t* url, HWND hwnd_video, mfplay** ret)
 try {
     CHECK_POINTER(url);
     CHECK_POINTER(ret);
     auto p = new mfplay_impl();
     auto p2 = com_ptr<mfplay>(p);
-    CHECK_HR(p->initialize(url, hwnd_video, hwnd_event));
+    CHECK_HR(p->initialize(url, hwnd_video));
     CHECK_HR(p->QueryInterface(IID_PPV_ARGS(ret)));
     return S_OK;
 } catch (const std::bad_alloc&) {
@@ -200,6 +200,7 @@ HRESULT mfplay_impl::on_event_callback2(com_ptr<IMFMediaEvent> event)
             break;
         }
     }
+    return S_OK;
 }
 
 HRESULT mfplay_impl::play()
