@@ -146,7 +146,7 @@ HRESULT STDMETHODCALLTYPE mfplay_impl::GetParameters(
 HRESULT STDMETHODCALLTYPE mfplay_impl::Invoke(
     /* [in] */ __RPC__in_opt IMFAsyncResult* pAsyncResult)
 {
-    MediaEventType event_type = MEUnknown; // Event type
+    MediaEventType event_type = MEUnknown;
     com_ptr<IMFMediaEvent> event;
 
     CHECK_HR(_session->EndGetEvent(pAsyncResult, &event));
@@ -170,19 +170,42 @@ void mfplay_impl::on_event_callback(std::weak_ptr<mfplay_impl> self, com_ptr<IMF
     if (self2 == nullptr) {
         return;
     }
+    self2->on_event_callback2(event);
+}
+
+HRESULT mfplay_impl::on_event_callback2(com_ptr<IMFMediaEvent> event)
+{
+    MediaEventType event_type = MEUnknown;
+    HRESULT status;
+    MF_TOPOSTATUS topo_status = MF_TOPOSTATUS_INVALID;
+
+    CHECK_HR(event->GetType(&event_type));
+    CHECK_HR(event->GetStatus(&status));
+    if (SUCCEEDED(status)) {
+        switch (event_type) {
+        case MESessionTopologyStatus:
+            CHECK_HR(event->GetUINT32(
+                MF_EVENT_TOPOLOGY_STATUS, reinterpret_cast<UINT32*>(&topo_status)));
+            switch (topo_status) {
+            case MF_TOPOSTATUS_READY:
+                MFGetService(
+                    _session.Get(), MR_VIDEO_RENDER_SERVICE, IID_PPV_ARGS(&_video_display));
+                CHECK_HR(start_playback());
+                break;
+            default:
+                break;
+            }
+        case MEEndOfPresentation:
+            _state = player_state::stopped;
+            break;
+        }
+    }
 }
 
 HRESULT mfplay_impl::play()
 {
     if (_state == player_state::paused || _state == player_state::stopped) {
-        PROPVARIANT varStart;
-        PropVariantInit(&varStart);
-
-        varStart.vt = VT_EMPTY;
-        HRESULT hr = _session->Start(&GUID_NULL, &varStart);
-        PropVariantClear(&varStart);
-        CHECK_HR(hr);
-        _state = player_state::started;
+        CHECK_HR(start_playback());
     }
     return S_OK;
 }
@@ -194,4 +217,18 @@ HRESULT mfplay_impl::pause()
         _state = player_state::paused;
     }
     return S_OK;
+}
+
+HRESULT mfplay_impl::start_playback()
+{
+    PROPVARIANT varStart;
+    PropVariantInit(&varStart);
+
+    varStart.vt = VT_EMPTY;
+    HRESULT hr = _session->Start(&GUID_NULL, &varStart);
+    PropVariantClear(&varStart);
+    CHECK_HR(hr);
+    _state = player_state::started;
+
+    return hr;
 }

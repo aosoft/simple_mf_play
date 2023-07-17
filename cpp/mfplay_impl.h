@@ -54,8 +54,12 @@ public:
 
 private:
     static void on_event_callback(std::weak_ptr<mfplay_impl> self, com_ptr<IMFMediaEvent> event);
+    HRESULT on_event_callback2(com_ptr<IMFMediaEvent> event);
 
 public:
     virtual HRESULT STDMETHODCALLTYPE play() override;
     virtual HRESULT STDMETHODCALLTYPE pause() override;
+
+private:
+    HRESULT start_playback();
 };
