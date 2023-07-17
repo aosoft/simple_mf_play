@@ -1,15 +1,18 @@
 #include "mfplay_impl.h"
 #include <exception>
 
-mfplay_impl::mfplay_impl(HWND hwnd_event)
-    : _hwnd_event(hwnd_event)
-    , _state(player_state::closed)
+mfplay_impl::mfplay_impl()
+    : _state(player_state::closed)
 {
 }
 
 HRESULT mfplay_impl::initialize(const wchar_t* url, HWND hwnd_video, HWND hwnd_event)
 {
     HRESULT hr = S_OK;
+
+    if (!_queue.attach(hwnd_event)) {
+        return E_FAIL;
+    }
 
     _close_event = unique_handle(::CreateEventW(nullptr, FALSE, FALSE, nullptr));
     if (_close_event == nullptr) {
@@ -93,10 +96,7 @@ HRESULT mfplay_impl::create_instance(const wchar_t* url, HWND hwnd_video, HWND h
 try {
     CHECK_POINTER(url);
     CHECK_POINTER(ret);
-    auto p = new mfplay_impl(hwnd_event);
-    if (!p->_queue.attach(hwnd_event)) {
-        return E_FAIL;
-    }
+    auto p = new mfplay_impl();
     auto p2 = com_ptr<mfplay>(p);
     CHECK_HR(p->initialize(url, hwnd_video, hwnd_event));
     CHECK_HR(p->QueryInterface(IID_PPV_ARGS(ret)));
@@ -217,6 +217,21 @@ HRESULT mfplay_impl::pause()
         _state = player_state::paused;
     }
     return S_OK;
+}
+
+HRESULT mfplay_impl::repaint()
+{
+    return _video_display != nullptr ? _video_display->RepaintVideo() : S_OK;
+}
+
+HRESULT mfplay_impl::resize_video(std::int32_t width, std::int32_t height)
+{
+    if (_video_display == nullptr)
+    {
+        return S_OK;
+    }
+    RECT rect = {0, 0, width, height};
+    return _video_display->SetVideoPosition(nullptr, &rect);
 }
 
 HRESULT mfplay_impl::start_playback()

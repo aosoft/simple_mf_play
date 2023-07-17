@@ -20,7 +20,6 @@ private:
     std::shared_ptr<mfplay_impl> _shared_this;
 
     player_state _state;
-    HWND _hwnd_event;
     window_message_queue _queue;
     com_ptr<IMFMediaSession> _session;
     com_ptr<IMFMediaSource> _source;
@@ -28,7 +27,7 @@ private:
     unique_handle _close_event;
 
 private:
-    mfplay_impl(HWND hwnd_event);
+    mfplay_impl();
     HRESULT initialize(const wchar_t* url, HWND hwnd_video, HWND hwnd_event);
 
 public:
@@ -59,6 +58,8 @@ private:
 public:
     virtual HRESULT STDMETHODCALLTYPE play() override;
     virtual HRESULT STDMETHODCALLTYPE pause() override;
+    virtual HRESULT STDMETHODCALLTYPE repaint() override;
+    virtual HRESULT STDMETHODCALLTYPE resize_video(std::int32_t width, std::int32_t height) override;
 
 private:
     HRESULT start_playback();
