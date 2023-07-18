@@ -9,6 +9,7 @@ fn main() {
 
     let bindings = bindgen::Builder::default()
         .header("cpp/mfplay.h")
+        .clang_args(["-xc++"])
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .generate()
         .expect("Unable to generate bindings");

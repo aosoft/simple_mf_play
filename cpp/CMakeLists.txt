@@ -3,6 +3,6 @@ project(mfplay)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_library(mfplay mfplay.cpp mfplay_initialize.cpp window_message_queue.cpp)
+add_library(mfplay mfplay.cpp mfplay_initialize.cpp window_message_queue.cpp mfplay_create_mfplay.cpp)
 
 install (TARGETS mfplay DESTINATION .)

@@ -56,10 +56,11 @@ private:
     HRESULT on_event_callback2(com_ptr<IMFMediaEvent> event);
 
 public:
-    virtual HRESULT STDMETHODCALLTYPE play() override;
-    virtual HRESULT STDMETHODCALLTYPE pause() override;
-    virtual HRESULT STDMETHODCALLTYPE repaint() override;
-    virtual HRESULT STDMETHODCALLTYPE resize_video(std::int32_t width, std::int32_t height) override;
+    virtual void dispose() override;
+    virtual HRESULT play() override;
+    virtual HRESULT pause() override;
+    virtual HRESULT repaint() override;
+    virtual HRESULT resize_video(std::int32_t width, std::int32_t height) override;
 
 private:
     HRESULT start_playback();

@@ -97,9 +97,10 @@ try {
     CHECK_POINTER(url);
     CHECK_POINTER(ret);
     auto p = new mfplay_impl();
-    auto p2 = com_ptr<mfplay>(p);
+    auto p2 = com_ptr<IUnknown>(p);
     CHECK_HR(p->initialize(url, hwnd_video));
-    CHECK_HR(p->QueryInterface(IID_PPV_ARGS(ret)));
+    p2->AddRef();
+    *ret = p;
     return S_OK;
 } catch (const std::bad_alloc&) {
     return E_OUTOFMEMORY;
@@ -201,6 +202,11 @@ HRESULT mfplay_impl::on_event_callback2(com_ptr<IMFMediaEvent> event)
         }
     }
     return S_OK;
+}
+
+void mfplay_impl::dispose()
+{
+    Release();
 }
 
 HRESULT mfplay_impl::play()
