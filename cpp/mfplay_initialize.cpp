@@ -2,13 +2,13 @@
 
 ATL::CAtlWinModule _Module;
 
-HRESULT mfplay_initialize()
+hresult_t mfplay_initialize()
 {
     CHECK_HR(MFStartup(MF_VERSION, 0));
     return S_OK;
 }
 
-HRESULT mfplay_finalize()
+hresult_t mfplay_finalize()
 {
     CHECK_HR(MFShutdown());
     _Module.Term();

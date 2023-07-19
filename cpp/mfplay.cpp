@@ -209,7 +209,7 @@ void mfplay_impl::dispose()
     Release();
 }
 
-HRESULT mfplay_impl::play()
+hresult_t mfplay_impl::play()
 {
     if (_state == player_state::paused || _state == player_state::stopped) {
         CHECK_HR(start_playback());
@@ -217,7 +217,7 @@ HRESULT mfplay_impl::play()
     return S_OK;
 }
 
-HRESULT mfplay_impl::pause()
+hresult_t mfplay_impl::pause()
 {
     if (_state == player_state::started) {
         CHECK_HR(_session->Pause());
@@ -226,12 +226,12 @@ HRESULT mfplay_impl::pause()
     return S_OK;
 }
 
-HRESULT mfplay_impl::repaint()
+hresult_t mfplay_impl::repaint()
 {
     return _video_display != nullptr ? _video_display->RepaintVideo() : S_OK;
 }
 
-HRESULT mfplay_impl::resize_video(std::int32_t width, std::int32_t height)
+hresult_t mfplay_impl::resize_video(std::int32_t width, std::int32_t height)
 {
     if (_video_display == nullptr)
     {

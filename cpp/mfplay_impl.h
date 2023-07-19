@@ -57,10 +57,10 @@ private:
 
 public:
     virtual void dispose() override;
-    virtual HRESULT play() override;
-    virtual HRESULT pause() override;
-    virtual HRESULT repaint() override;
-    virtual HRESULT resize_video(std::int32_t width, std::int32_t height) override;
+    virtual hresult_t play() override;
+    virtual hresult_t pause() override;
+    virtual hresult_t repaint() override;
+    virtual hresult_t resize_video(std::int32_t width, std::int32_t height) override;
 
 private:
     HRESULT start_playback();
