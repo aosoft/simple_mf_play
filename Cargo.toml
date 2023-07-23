@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 
 winit = "0.28.6"
+windows = "0.48.0"
 
 [build-dependencies]
 
