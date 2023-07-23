@@ -1,5 +1,10 @@
 #include "mfplay_impl.h"
 
+#pragma comment(lib, "mf.lib")
+#pragma comment(lib, "mfuuid.lib")
+#pragma comment(lib, "evr.lib")
+#pragma comment(lib, "dxva2.lib")
+
 ATL::CAtlWinModule _Module;
 
 hresult_t mfplay_initialize()

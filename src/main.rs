@@ -1,4 +1,4 @@
-
+mod mfplay;
 
 use winit::{
     event::{Event, WindowEvent},
