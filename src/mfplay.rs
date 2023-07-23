@@ -14,7 +14,11 @@ impl Mfplay {
         unsafe {
             let mut core: *mut mfplay_sys::mfplay = std::ptr::null_mut();
             let hr = mfplay_sys::create_mfplay(HSTRING::from(url).as_ptr(), std::mem::transmute(hwnd_video), &mut core);
-            todo!();
+            if hr < 0 {
+                Err(hr)
+            } else {
+                Ok(Mfplay{ core })
+            }
         }
     }
 }
