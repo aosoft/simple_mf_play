@@ -5,7 +5,7 @@ mod mfplay_sys;
 
 type HResult = mfplay_sys::hresult_t;
 
-struct Mfplay {
+pub struct Mfplay {
     core: *mut mfplay_sys::mfplay
 }
 
