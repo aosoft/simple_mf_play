@@ -6,6 +6,8 @@ fn main() {
     let dst = cmake::build("cpp");
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("cargo:rustc-link-lib=static=mfplay");
+    println!("cargo:rustc-link-lib=static=mf");
+    println!("cargo:rustc-link-lib=static=mfuuid");
 
     let bindings = bindgen::Builder::default()
         .header("cpp/mfplay.h")

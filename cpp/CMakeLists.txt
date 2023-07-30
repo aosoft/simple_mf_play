@@ -5,6 +5,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
-add_library(mfplay mfplay.cpp mfplay_initialize.cpp window_message_queue.cpp mfplay_create_mfplay.cpp)
+add_library(mfplay
+        initguid.cpp
+        mfplay.cpp
+        mfplay_initialize.cpp
+        window_message_queue.cpp
+        mfplay_create_mfplay.cpp)
 
 install (TARGETS mfplay DESTINATION .)
