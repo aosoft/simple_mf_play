@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common.h"
-#include "mfplay.h"
+#include "mfplay_lib.h"
 #include "window_message_queue.h"
 
 #include <atomic>

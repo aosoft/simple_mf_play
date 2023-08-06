@@ -8,11 +8,9 @@ fn main() {
         .build();
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("cargo:rustc-link-lib=static=mfplay");
-    println!("cargo:rustc-link-lib=static=mf");
-    println!("cargo:rustc-link-lib=static=mfuuid");
 
     let bindings = bindgen::Builder::default()
-        .header("cpp/libs/mfplay.h")
+        .header("cpp/libs/mfplay_lib.h")
         .clang_args(["-xc++"])
         .vtable_generation(true)
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
