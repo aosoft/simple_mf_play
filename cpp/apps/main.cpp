@@ -32,6 +32,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+    win = nullptr;
 
     return 0;
 }
