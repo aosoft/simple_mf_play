@@ -1,16 +1,18 @@
-use cmake;
+use cmake::Config;
 use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    let dst = cmake::build("cpp");
+    let dst = Config::new("cpp/libs")
+        .define("CMAKE_MSVC_RUNTIME_LIBRARY", "MultiThreadedDLL")
+        .build();
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("cargo:rustc-link-lib=static=mfplay");
     println!("cargo:rustc-link-lib=static=mf");
     println!("cargo:rustc-link-lib=static=mfuuid");
 
     let bindings = bindgen::Builder::default()
-        .header("cpp/mfplay.h")
+        .header("cpp/libs/mfplay.h")
         .clang_args(["-xc++"])
         .vtable_generation(true)
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
