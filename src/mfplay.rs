@@ -30,3 +30,22 @@ impl Drop for Mfplay {
         }
     }
 }
+
+pub struct MfRuntimeInitializer();
+
+impl MfRuntimeInitializer {
+    pub fn new() -> MfRuntimeInitializer {
+        unsafe {
+            mfplay_sys::mfplay_initialize();
+            MfRuntimeInitializer()
+        }
+    }
+}
+
+impl Drop for MfRuntimeInitializer {
+    fn drop(&mut self) {
+        unsafe {
+            mfplay_sys::mfplay_finalize();
+        }
+    }
+}

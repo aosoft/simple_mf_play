@@ -11,4 +11,4 @@ add_library(mfplay
         window_message_queue.cpp
         mfplay_create_mfplay.cpp)
 
-install (TARGETS mfplay DESTINATION ..)
+install (TARGETS mfplay DESTINATION .)
