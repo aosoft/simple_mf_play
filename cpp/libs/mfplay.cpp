@@ -27,6 +27,7 @@ HRESULT mfplay_impl::initialize(const wchar_t* url, HWND hwnd_video)
     DWORD source_streams;
 
     CHECK_HR(MFCreateMediaSession(nullptr, &_session));
+    CHECK_HR(_session->BeginGetEvent(this, nullptr));
     CHECK_HR(MFCreateSourceResolver(&source_resolver));
     CHECK_HR(source_resolver->CreateObjectFromURL(
         url, MF_RESOLUTION_MEDIASOURCE, nullptr, &object_type, &source));

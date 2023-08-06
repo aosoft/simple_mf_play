@@ -24,8 +24,8 @@ LRESULT main_window::OnCreate(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
     _self = shared_from_this();
 
     HRESULT hr = create_mfplay(L"C:\\WORK\\Media\\Video\\test.mp4", m_hWnd, &_player);
-    if (FAILED(hr)) {
-        _player = nullptr;
+    if (SUCCEEDED(hr)) {
+        _player->play();
     }
 
     bHandled = TRUE;
