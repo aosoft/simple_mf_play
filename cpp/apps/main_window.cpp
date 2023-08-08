@@ -7,8 +7,7 @@ main_window::main_window()
 
 main_window::~main_window()
 {
-    if (_player != nullptr)
-    {
+    if (_player != nullptr) {
         _player->dispose();
         _player = nullptr;
     }
@@ -28,6 +27,31 @@ LRESULT main_window::OnCreate(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
         _player->play();
     }
 
+    bHandled = TRUE;
+    return 0;
+}
+
+LRESULT main_window::OnEraseBackground(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+    bHandled = TRUE;
+    return 1;
+}
+
+LRESULT main_window::OnSize(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+    RECT rect;
+    if (GetClientRect(&rect)) {
+
+        _player->resize_video(rect.right - rect.left, rect.bottom - rect.top);
+    }
+
+    bHandled = TRUE;
+    return 0;
+}
+
+LRESULT main_window::OnPaint(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+    _player->repaint();
     bHandled = TRUE;
     return 0;
 }
