@@ -97,11 +97,16 @@ HRESULT mfplay_impl::create_instance(const wchar_t* url, HWND hwnd_video, mfplay
 try {
     CHECK_POINTER(url);
     CHECK_POINTER(ret);
-    auto p = new mfplay_impl();
-    auto p2 = com_ptr<IUnknown>(p);
+
+    struct mfplay_impl_ : public mfplay_impl {
+    };
+
+    auto p = std::make_shared<mfplay_impl_>();
     CHECK_HR(p->initialize(url, hwnd_video));
+    com_ptr<IUnknown> p2;
+    CHECK_HR(p->QueryInterface(IID_PPV_ARGS(&p2)));
     p2->AddRef();
-    *ret = p;
+    *ret = p.get();
     return S_OK;
 } catch (const std::bad_alloc&) {
     return E_OUTOFMEMORY;
@@ -234,11 +239,10 @@ hresult_t mfplay_impl::repaint()
 
 hresult_t mfplay_impl::resize_video(std::int32_t width, std::int32_t height)
 {
-    if (_video_display == nullptr)
-    {
+    if (_video_display == nullptr) {
         return S_OK;
     }
-    RECT rect = {0, 0, width, height};
+    RECT rect = { 0, 0, width, height };
     return _video_display->SetVideoPosition(nullptr, &rect);
 }
 
