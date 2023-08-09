@@ -8,7 +8,7 @@ use winit::{
 use winit::platform::windows::WindowExtWindows;
 
 fn main() {
-    let _ = mfplay::MfRuntimeInitializer();
+    let x = mfplay::MfRuntimeInitializer::new();
 
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new().build(&event_loop).unwrap();
@@ -23,6 +23,10 @@ fn main() {
                 event: WindowEvent::CloseRequested,
                 window_id,
             } if window_id == window.id() => *control_flow = ControlFlow::Exit,
+            Event::WindowEvent {
+                event: WindowEvent::Resized(size),
+                window_id,
+            } if window_id == window.id() => p.resize(size.width as i32, size.height as i32).unwrap(),
             _ => (),
         }
     });

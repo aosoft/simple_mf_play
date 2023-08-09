@@ -21,6 +21,13 @@ impl Mfplay {
             }
         }
     }
+
+    pub fn resize(&self, width: i32, height: i32) -> Result<(), HResult> {
+        unsafe {
+            ((*(self.core)).vtable_.as_ref().unwrap().mfplay_resize_video)(self.core, width, height);
+            Ok(())
+        }
+    }
 }
 
 impl Drop for Mfplay {
