@@ -7,10 +7,10 @@ fn main() {
         .define("CMAKE_MSVC_RUNTIME_LIBRARY", "MultiThreadedDLL")
         .build();
     println!("cargo:rustc-link-search=native={}", dst.display());
-    println!("cargo:rustc-link-lib=static=mfplay");
+    println!("cargo:rustc-link-lib=static=mfplayer");
 
     let bindings = bindgen::Builder::default()
-        .header("cpp/libs/mfplay_lib.h")
+        .header("cpp/libs/mfplayer.h")
         .clang_args(["-xc++"])
         .vtable_generation(true)
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))

@@ -15,7 +15,7 @@ enum class player_state : std::int32_t {
 using hresult_t = std::int32_t;
 using hwnd_t = void*;
 
-class mfplay {
+class mfplayer {
 public:
     virtual void dispose() = 0;
     virtual hresult_t play() = 0;
@@ -26,7 +26,7 @@ public:
 
 extern "C" {
 
-hresult_t __declspec(dllexport) mfplay_initialize();
-hresult_t __declspec(dllexport) mfplay_finalize();
-hresult_t __declspec(dllexport) create_mfplay(const wchar_t* url, hwnd_t hwnd_video, mfplay**ret);
+hresult_t __declspec(dllexport) mfplayer_initialize();
+hresult_t __declspec(dllexport) mfplayer_finalize();
+hresult_t __declspec(dllexport) create_mfplayer(const wchar_t* url, hwnd_t hwnd_video, mfplayer**ret);
 }

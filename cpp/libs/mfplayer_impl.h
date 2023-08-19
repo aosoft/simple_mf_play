@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common.h"
-#include "mfplay_lib.h"
+#include "mfplayer.h"
 #include "window_message_queue.h"
 
 #include <atomic>
@@ -12,12 +12,12 @@
 #include <mfidl.h>
 #include <mfobjects.h>
 
-class mfplay_impl : public mfplay,
+class mfplayer_impl : public mfplayer,
                     public IMFAsyncCallback,
-                    public std::enable_shared_from_this<mfplay_impl> {
+                    public std::enable_shared_from_this<mfplayer_impl> {
 private:
     std::atomic_int32_t _ref_count;
-    std::shared_ptr<mfplay_impl> _shared_this;
+    std::shared_ptr<mfplayer_impl> _shared_this;
 
     player_state _state;
     window_message_queue _queue;
@@ -27,12 +27,12 @@ private:
     unique_handle _close_event;
 
 private:
-    mfplay_impl();
+    mfplayer_impl();
     HRESULT initialize(const wchar_t* url, HWND hwnd_video);
 
 public:
-    virtual ~mfplay_impl();
-    static HRESULT create_instance(const wchar_t* url, HWND hwnd_video, mfplay** ret);
+    virtual ~mfplayer_impl();
+    static HRESULT create_instance(const wchar_t* url, HWND hwnd_video, mfplayer** ret);
 
 public:
     virtual HRESULT STDMETHODCALLTYPE QueryInterface(
@@ -52,7 +52,7 @@ public:
         /* [in] */ __RPC__in_opt IMFAsyncResult* pAsyncResult) override;
 
 private:
-    static void on_event_callback(std::weak_ptr<mfplay_impl> self, com_ptr<IMFMediaEvent> event);
+    static void on_event_callback(std::weak_ptr<mfplayer_impl> self, com_ptr<IMFMediaEvent> event);
     HRESULT on_event_callback2(com_ptr<IMFMediaEvent> event);
 
 public:

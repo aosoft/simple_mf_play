@@ -8,7 +8,7 @@ extern ATL::CAtlWinModule _Module;
 #include <atlwin.h>
 
 #include <memory>
-#include <mfplay_lib.h>
+#include <mfplayer.h>
 
 class main_window : public ATL::CWindowImpl<main_window>,
                     public std::enable_shared_from_this<main_window> {
@@ -17,7 +17,7 @@ public:
 
 private:
     std::shared_ptr<main_window> _self;
-    mfplay* _player;
+    mfplayer* _player;
 
 private:
     BEGIN_MSG_MAP(main_window)

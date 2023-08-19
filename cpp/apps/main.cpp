@@ -1,16 +1,16 @@
 #include <windows.h>
 
-#include <mfplay_lib.h>
+#include <mfplayer.h>
 #include "main_window.h"
 
 struct mfplay_runtime_initializer {
     mfplay_runtime_initializer()
     {
-        mfplay_initialize();
+        mfplayer_initialize();
     }
     ~mfplay_runtime_initializer()
     {
-        mfplay_finalize();
+        mfplayer_finalize();
     }
 };
 

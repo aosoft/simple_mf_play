@@ -1,4 +1,4 @@
-#include "mfplay_impl.h"
+#include "mfplayer_impl.h"
 
 #pragma comment(lib, "mf.lib")
 #pragma comment(lib, "mfplat.lib")
@@ -8,13 +8,13 @@
 
 ATL::CAtlWinModule _Module;
 
-hresult_t mfplay_initialize()
+hresult_t mfplayer_initialize()
 {
     CHECK_HR(MFStartup(MF_VERSION, 0));
     return S_OK;
 }
 
-hresult_t mfplay_finalize()
+hresult_t mfplayer_finalize()
 {
     CHECK_HR(MFShutdown());
     _Module.Term();

@@ -1,12 +1,12 @@
-#include "mfplay_impl.h"
+#include "mfplayer_impl.h"
 #include <exception>
 
-mfplay_impl::mfplay_impl()
+mfplayer_impl::mfplayer_impl()
     : _state(player_state::closed)
 {
 }
 
-HRESULT mfplay_impl::initialize(const wchar_t* url, HWND hwnd_video)
+HRESULT mfplayer_impl::initialize(const wchar_t* url, HWND hwnd_video)
 {
     HRESULT hr = S_OK;
 
@@ -77,7 +77,7 @@ HRESULT mfplay_impl::initialize(const wchar_t* url, HWND hwnd_video)
     return S_OK;
 }
 
-mfplay_impl::~mfplay_impl()
+mfplayer_impl::~mfplayer_impl()
 {
     if (_session != nullptr) {
         _session->Close();
@@ -93,12 +93,12 @@ mfplay_impl::~mfplay_impl()
     }
 }
 
-HRESULT mfplay_impl::create_instance(const wchar_t* url, HWND hwnd_video, mfplay** ret)
+HRESULT mfplayer_impl::create_instance(const wchar_t* url, HWND hwnd_video, mfplayer** ret)
 try {
     CHECK_POINTER(url);
     CHECK_POINTER(ret);
 
-    struct mfplay_impl_ : public mfplay_impl {
+    struct mfplay_impl_ : public mfplayer_impl {
     };
 
     auto p = std::make_shared<mfplay_impl_>();
@@ -112,7 +112,7 @@ try {
     return E_OUTOFMEMORY;
 }
 
-HRESULT STDMETHODCALLTYPE mfplay_impl::QueryInterface(
+HRESULT STDMETHODCALLTYPE mfplayer_impl::QueryInterface(
     /* [in] */ REFIID riid,
     /* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
 {
@@ -125,7 +125,7 @@ HRESULT STDMETHODCALLTYPE mfplay_impl::QueryInterface(
     return E_NOINTERFACE;
 }
 
-ULONG STDMETHODCALLTYPE mfplay_impl::AddRef(void)
+ULONG STDMETHODCALLTYPE mfplayer_impl::AddRef(void)
 {
     int32_t count = ++_ref_count;
     if (count == 1) {
@@ -134,7 +134,7 @@ ULONG STDMETHODCALLTYPE mfplay_impl::AddRef(void)
     return count;
 }
 
-ULONG STDMETHODCALLTYPE mfplay_impl::Release(void)
+ULONG STDMETHODCALLTYPE mfplayer_impl::Release(void)
 {
     int32_t count = --_ref_count;
     if (count == 0) {
@@ -143,14 +143,14 @@ ULONG STDMETHODCALLTYPE mfplay_impl::Release(void)
     return count;
 }
 
-HRESULT STDMETHODCALLTYPE mfplay_impl::GetParameters(
+HRESULT STDMETHODCALLTYPE mfplayer_impl::GetParameters(
     /* [out] */ __RPC__out DWORD* pdwFlags,
     /* [out] */ __RPC__out DWORD* pdwQueue)
 {
     return E_NOTIMPL;
 }
 
-HRESULT STDMETHODCALLTYPE mfplay_impl::Invoke(
+HRESULT STDMETHODCALLTYPE mfplayer_impl::Invoke(
     /* [in] */ __RPC__in_opt IMFAsyncResult* pAsyncResult)
 {
     MediaEventType event_type = MEUnknown;
@@ -171,7 +171,7 @@ HRESULT STDMETHODCALLTYPE mfplay_impl::Invoke(
     return S_OK;
 }
 
-void mfplay_impl::on_event_callback(std::weak_ptr<mfplay_impl> self, com_ptr<IMFMediaEvent> event)
+void mfplayer_impl::on_event_callback(std::weak_ptr<mfplayer_impl> self, com_ptr<IMFMediaEvent> event)
 {
     auto self2 = self.lock();
     if (self2 == nullptr) {
@@ -180,7 +180,7 @@ void mfplay_impl::on_event_callback(std::weak_ptr<mfplay_impl> self, com_ptr<IMF
     self2->on_event_callback2(event);
 }
 
-HRESULT mfplay_impl::on_event_callback2(com_ptr<IMFMediaEvent> event)
+HRESULT mfplayer_impl::on_event_callback2(com_ptr<IMFMediaEvent> event)
 {
     MediaEventType event_type = MEUnknown;
     HRESULT status;
@@ -210,12 +210,12 @@ HRESULT mfplay_impl::on_event_callback2(com_ptr<IMFMediaEvent> event)
     return S_OK;
 }
 
-void mfplay_impl::dispose()
+void mfplayer_impl::dispose()
 {
     Release();
 }
 
-hresult_t mfplay_impl::play()
+hresult_t mfplayer_impl::play()
 {
     if (_state == player_state::paused || _state == player_state::stopped) {
         CHECK_HR(start_playback());
@@ -223,7 +223,7 @@ hresult_t mfplay_impl::play()
     return S_OK;
 }
 
-hresult_t mfplay_impl::pause()
+hresult_t mfplayer_impl::pause()
 {
     if (_state == player_state::started) {
         CHECK_HR(_session->Pause());
@@ -232,12 +232,12 @@ hresult_t mfplay_impl::pause()
     return S_OK;
 }
 
-hresult_t mfplay_impl::repaint()
+hresult_t mfplayer_impl::repaint()
 {
     return _video_display != nullptr ? _video_display->RepaintVideo() : S_OK;
 }
 
-hresult_t mfplay_impl::resize_video(std::int32_t width, std::int32_t height)
+hresult_t mfplayer_impl::resize_video(std::int32_t width, std::int32_t height)
 {
     if (_video_display == nullptr) {
         return S_OK;
@@ -246,7 +246,7 @@ hresult_t mfplay_impl::resize_video(std::int32_t width, std::int32_t height)
     return _video_display->SetVideoPosition(nullptr, &rect);
 }
 
-HRESULT mfplay_impl::start_playback()
+HRESULT mfplayer_impl::start_playback()
 {
     PROPVARIANT varStart;
     PropVariantInit(&varStart);
