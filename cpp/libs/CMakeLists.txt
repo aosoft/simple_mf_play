@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 
 add_library(mfplayer
         initguid.cpp
-        mfplayer.cpp
+        mfplayer_impl.cpp
         mfplayer_initialize.cpp
         window_message_queue.cpp
         mfplayer_create_mfplayer.cpp)
