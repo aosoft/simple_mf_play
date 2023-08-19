@@ -1,19 +1,19 @@
 use winit::platform::windows::HWND;
 use windows::core::HSTRING;
 
-mod mfplay_sys;
+mod mfplayer_sys;
 
-type HResult = mfplay_sys::hresult_t;
+type HResult = mfplayer_sys::hresult_t;
 
 pub struct Mfplay {
-    core: *mut mfplay_sys::mfplayer
+    core: *mut mfplayer_sys::mfplayer
 }
 
 impl Mfplay {
     pub fn new(url: &str, hwnd_video: HWND) -> Result<Mfplay, HResult> {
         unsafe {
-            let mut core: *mut mfplay_sys::mfplayer = std::ptr::null_mut();
-            let hr = mfplay_sys::create_mfplayer(HSTRING::from(url).as_ptr(), std::mem::transmute(hwnd_video), &mut core);
+            let mut core: *mut mfplayer_sys::mfplayer = std::ptr::null_mut();
+            let hr = mfplayer_sys::create_mfplayer(HSTRING::from(url).as_ptr(), std::mem::transmute(hwnd_video), &mut core);
             if hr < 0 {
                 Err(hr)
             } else {
@@ -43,7 +43,7 @@ pub struct MfRuntimeInitializer();
 impl MfRuntimeInitializer {
     pub fn new() -> MfRuntimeInitializer {
         unsafe {
-            mfplay_sys::mfplayer_initialize();
+            mfplayer_sys::mfplayer_initialize();
             MfRuntimeInitializer()
         }
     }
@@ -52,7 +52,7 @@ impl MfRuntimeInitializer {
 impl Drop for MfRuntimeInitializer {
     fn drop(&mut self) {
         unsafe {
-            mfplay_sys::mfplayer_finalize();
+            mfplayer_sys::mfplayer_finalize();
         }
     }
 }
