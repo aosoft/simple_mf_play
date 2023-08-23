@@ -27,7 +27,23 @@ HRESULT mfplayer_impl::initialize(const wchar_t* url, HWND hwnd_video)
     DWORD source_streams;
 
     CHECK_HR(MFCreateMediaSession(nullptr, &_session));
-    CHECK_HR(_session->BeginGetEvent(this, nullptr));
+
+    _callback = std::make_shared<async_callback>(_session.Get(), [self = weak_from_this()](com_ptr<IMFMediaEvent> event) -> HRESULT {
+        auto self2 = self.lock();
+        if (self2 != nullptr) {
+            if (self2->_state != player_state::closing) {
+                self2->_queue.push([self, event]() {
+                    auto self2 = self.lock();
+                    if (self2 != nullptr) {
+                        self2->on_event_callback(event);
+                    }
+                });
+            }
+        }
+        return S_OK;
+    });
+    CHECK_HR(_session->BeginGetEvent(_callback.get(), nullptr));
+
     CHECK_HR(MFCreateSourceResolver(&source_resolver));
     CHECK_HR(source_resolver->CreateObjectFromURL(
         url, MF_RESOLUTION_MEDIASOURCE, nullptr, &object_type, &source));
@@ -73,21 +89,6 @@ HRESULT mfplayer_impl::initialize(const wchar_t* url, HWND hwnd_video)
     }
     CHECK_HR(_session->SetTopology(0, topology.Get()));
     _state = player_state::open_pending;
-
-    _callback = std::make_shared<async_callback>(_session.Get(), [self = weak_from_this()](com_ptr<IMFMediaEvent> event) -> HRESULT {
-        auto self2 = self.lock();
-        if (self2 != nullptr) {
-            if (self2->_state != player_state::closing) {
-                self2->_queue.push([self, event]() {
-                    auto self2 = self.lock();
-                    if (self2 != nullptr) {
-                        self2->on_event_callback(event);
-                    }
-                });
-            }
-        }
-        return S_OK;
-    });
 
     return S_OK;
 }
