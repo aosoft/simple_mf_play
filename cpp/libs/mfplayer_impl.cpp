@@ -74,6 +74,21 @@ HRESULT mfplayer_impl::initialize(const wchar_t* url, HWND hwnd_video)
     CHECK_HR(_session->SetTopology(0, topology.Get()));
     _state = player_state::open_pending;
 
+    _callback = std::make_shared<async_callback>(_session.Get(), [self = weak_from_this()](com_ptr<IMFMediaEvent> event) -> HRESULT {
+        auto self2 = self.lock();
+        if (self2 != nullptr) {
+            if (self2->_state != player_state::closing) {
+                self2->_queue.push([self, event]() {
+                    auto self2 = self.lock();
+                    if (self2 != nullptr) {
+                        self2->on_event_callback(event);
+                    }
+                });
+            }
+        }
+        return S_OK;
+    });
+
     return S_OK;
 }
 
@@ -103,84 +118,14 @@ try {
 
     auto p = std::make_shared<mfplay_impl_>();
     CHECK_HR(p->initialize(url, hwnd_video));
-    com_ptr<IUnknown> p2;
-    CHECK_HR(p->QueryInterface(IID_PPV_ARGS(&p2)));
-    p2->AddRef();
+    p->_shared_this = p->shared_from_this();
     *ret = p.get();
     return S_OK;
 } catch (const std::bad_alloc&) {
     return E_OUTOFMEMORY;
 }
 
-HRESULT STDMETHODCALLTYPE mfplayer_impl::QueryInterface(
-    /* [in] */ REFIID riid,
-    /* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
-{
-    CHECK_POINTER(ppvObject);
-    if (riid == IID_IUnknown) {
-        *ppvObject = this;
-        AddRef();
-        return S_OK;
-    }
-    return E_NOINTERFACE;
-}
-
-ULONG STDMETHODCALLTYPE mfplayer_impl::AddRef(void)
-{
-    int32_t count = ++_ref_count;
-    if (count == 1) {
-        _shared_this = weak_from_this().lock();
-    }
-    return count;
-}
-
-ULONG STDMETHODCALLTYPE mfplayer_impl::Release(void)
-{
-    int32_t count = --_ref_count;
-    if (count == 0) {
-        _shared_this = nullptr;
-    }
-    return count;
-}
-
-HRESULT STDMETHODCALLTYPE mfplayer_impl::GetParameters(
-    /* [out] */ __RPC__out DWORD* pdwFlags,
-    /* [out] */ __RPC__out DWORD* pdwQueue)
-{
-    return E_NOTIMPL;
-}
-
-HRESULT STDMETHODCALLTYPE mfplayer_impl::Invoke(
-    /* [in] */ __RPC__in_opt IMFAsyncResult* pAsyncResult)
-{
-    MediaEventType event_type = MEUnknown;
-    com_ptr<IMFMediaEvent> event;
-
-    CHECK_HR(_session->EndGetEvent(pAsyncResult, &event));
-    CHECK_HR(event->GetType(&event_type));
-    if (event_type == MESessionClosed) {
-        SetEvent(_close_event.get());
-    } else {
-        CHECK_HR(_session->BeginGetEvent(this, nullptr));
-    }
-
-    if (_state != player_state::closing) {
-        _queue.push(std::bind(on_event_callback, weak_from_this(), event));
-    }
-
-    return S_OK;
-}
-
-void mfplayer_impl::on_event_callback(std::weak_ptr<mfplayer_impl> self, com_ptr<IMFMediaEvent> event)
-{
-    auto self2 = self.lock();
-    if (self2 == nullptr) {
-        return;
-    }
-    self2->on_event_callback2(event);
-}
-
-HRESULT mfplayer_impl::on_event_callback2(com_ptr<IMFMediaEvent> event)
+HRESULT mfplayer_impl::on_event_callback(com_ptr<IMFMediaEvent> event)
 {
     MediaEventType event_type = MEUnknown;
     HRESULT status;
@@ -212,7 +157,7 @@ HRESULT mfplayer_impl::on_event_callback2(com_ptr<IMFMediaEvent> event)
 
 void mfplayer_impl::dispose()
 {
-    Release();
+    _shared_this = nullptr;
 }
 
 hresult_t mfplayer_impl::play()

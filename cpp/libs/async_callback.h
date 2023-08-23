@@ -12,10 +12,10 @@ private:
     std::shared_ptr<async_callback> _shared_this;
     com_ptr<IMFMediaSession> _session;
 
-    std::function<HRESULT(IMFAsyncResult*)> _fn;
+    std::function<HRESULT(com_ptr<IMFMediaEvent>)> _fn;
 
 public:
-    async_callback(IMFMediaSession* session, std::function<HRESULT(IMFAsyncResult*)> fn);
+    async_callback(IMFMediaSession* session, std::function<HRESULT(com_ptr<IMFMediaEvent>)> fn);
 
     HRESULT STDMETHODCALLTYPE QueryInterface(
         /* [in] */ REFIID riid,

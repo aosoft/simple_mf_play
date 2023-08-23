@@ -2,7 +2,7 @@
 
 #include <utility>
 
-async_callback::async_callback(IMFMediaSession* session, std::function<HRESULT(IMFAsyncResult*)> fn)
+async_callback::async_callback(IMFMediaSession* session, std::function<HRESULT(com_ptr<IMFMediaEvent>)> fn)
     : _session(session)
     , _fn(std::move(fn))
 {
@@ -58,7 +58,7 @@ HRESULT STDMETHODCALLTYPE async_callback::Invoke(
         if (event_type != MESessionClosed) {
             CHECK_HR(_session->BeginGetEvent(this, nullptr));
         }
-        return _fn(pAsyncResult);
+        return _fn(event);
     }
 
     return S_OK;
