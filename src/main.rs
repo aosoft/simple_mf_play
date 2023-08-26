@@ -1,5 +1,6 @@
 mod mfplayer;
 
+use std::env;
 use winit::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
@@ -8,12 +9,17 @@ use winit::{
 use winit::platform::windows::WindowExtWindows;
 
 fn main() {
-    let x = mfplayer::MfRuntimeInitializer::new();
+    let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+        return;
+    }
+
+    let _x = mfplayer::MfRuntimeInitializer::new();
 
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new().build(&event_loop).unwrap();
 
-    let p = mfplayer::Mfplay::new("C:\\WORK\\Media\\Video\\test.mp4", window.hwnd()).unwrap();
+    let p = mfplayer::Mfplay::new(&args[1], window.hwnd()).unwrap();
 
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Wait;
