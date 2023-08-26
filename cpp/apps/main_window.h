@@ -8,6 +8,7 @@ extern ATL::CAtlWinModule _Module;
 #include <atlwin.h>
 
 #include <memory>
+#include <string>
 #include <mfplayer.h>
 
 class main_window : public ATL::CWindowImpl<main_window>,
@@ -16,6 +17,7 @@ public:
     DECLARE_WND_CLASS("simple_mf_play");
 
 private:
+    const std::wstring _source_path;
     std::shared_ptr<main_window> _self;
     mfplayer* _player;
 
@@ -39,6 +41,6 @@ private:
     static LRESULT OnDestroy(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 public:
-    main_window();
+    main_window(const std::wstring&& source_path);
     ~main_window();
 };

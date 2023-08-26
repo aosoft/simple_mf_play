@@ -14,10 +14,14 @@ struct mfplay_runtime_initializer {
     }
 };
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nCmdShow)
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
+    auto source_path = std::wstring(pCmdLine);
+    if (source_path.empty()) {
+        return 0;
+    }
     mfplay_runtime_initializer initializer;
-    auto win = std::make_shared<main_window>();
+    auto win = std::make_shared<main_window>(std::move(source_path));
     if (win->Create(nullptr, ATL::CWindow::rcDefault, "", WS_OVERLAPPEDWINDOW) == nullptr) {
         return 0;
     }

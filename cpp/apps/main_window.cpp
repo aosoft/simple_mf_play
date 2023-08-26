@@ -1,8 +1,7 @@
 #include "main_window.h"
 
-main_window::main_window()
+main_window::main_window(const std::wstring&& source_path) : _source_path(source_path), _player(nullptr)
 {
-    _player = nullptr;
 }
 
 main_window::~main_window()
@@ -22,7 +21,7 @@ LRESULT main_window::OnCreate(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 {
     _self = shared_from_this();
 
-    HRESULT hr = create_mfplayer(L"C:\\WORK\\Media\\Video\\test.mp4", m_hWnd, &_player);
+    HRESULT hr = create_mfplayer(_source_path.c_str(), m_hWnd, &_player);
     if (SUCCEEDED(hr)) {
         _player->play();
     }
