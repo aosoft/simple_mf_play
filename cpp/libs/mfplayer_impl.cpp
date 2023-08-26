@@ -8,9 +8,7 @@ mfplayer_impl::mfplayer_impl()
 
 HRESULT mfplayer_impl::initialize(const wchar_t* url, HWND hwnd_video)
 {
-    HRESULT hr = S_OK;
-
-    if (!_queue.attach(hwnd_video)) {
+   if (!_queue.attach(hwnd_video)) {
         return E_FAIL;
     }
 

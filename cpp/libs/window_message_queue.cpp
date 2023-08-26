@@ -1,9 +1,6 @@
 #include "window_message_queue.h"
 
-window_message_queue::window_message_queue()
-    : _hwnd(nullptr)
-{
-}
+window_message_queue::window_message_queue() = default;
 
 window_message_queue::~window_message_queue() noexcept
 {
@@ -12,11 +9,10 @@ window_message_queue::~window_message_queue() noexcept
 
 bool window_message_queue::attach(HWND hwnd)
 {
-    if (_hwnd != nullptr) {
-        return hwnd == _hwnd;
+    if (m_hWnd != nullptr) {
+        return hwnd == m_hWnd;
     }
     if (SubclassWindow(hwnd)) {
-        _hwnd = hwnd;
         return true;
     }
     return false;
@@ -24,13 +20,13 @@ bool window_message_queue::attach(HWND hwnd)
 
 void window_message_queue::detach()
 {
-    if (_hwnd == nullptr) {
+    if (m_hWnd == nullptr) {
         return;
     }
     UnsubclassWindow();
 }
 
-void window_message_queue::push(std::function<void()> fn)
+void window_message_queue::push(const std::function<void()>& fn)
 {
     {
         std::lock_guard lock(_mutex);

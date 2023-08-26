@@ -10,17 +10,16 @@ class window_message_queue : ATL::CWindowImpl<window_message_queue> {
 private:
     const UINT WM_APP_MESSAGE_EVENT = WM_APP + 1;
 
-    HWND _hwnd;
     std::mutex _mutex;
     std::queue<std::function<void()>> _queue;
 
 public:
     window_message_queue();
-    ~window_message_queue();
+    ~window_message_queue() override;
 
     bool attach(HWND hwnd);
     void detach();
-    void push(std::function<void()> fn);
+    void push(const std::function<void()>& fn);
 
 public:
     BEGIN_MSG_MAP(window_message_queue)

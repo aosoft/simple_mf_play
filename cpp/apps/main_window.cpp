@@ -59,6 +59,7 @@ LRESULT main_window::OnPaint(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHand
 LRESULT main_window::OnClose(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     ::PostQuitMessage(0);
+    DestroyWindow();
     bHandled = TRUE;
     return 0;
 }

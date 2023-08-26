@@ -32,11 +32,11 @@ private:
     void OnFinalMessage(HWND) override;
 
     LRESULT OnCreate(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-    LRESULT OnEraseBackground(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    static LRESULT OnEraseBackground(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     LRESULT OnSize(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     LRESULT OnPaint(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     LRESULT OnClose(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-    LRESULT OnDestroy(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    static LRESULT OnDestroy(UINT msg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 public:
     main_window();
