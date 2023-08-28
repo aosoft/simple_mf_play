@@ -3,14 +3,14 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    let dst = Config::new("cpp/libs/mf")
+    let dst = Config::new("cpp/libs/mfplayer")
         .define("CMAKE_MSVC_RUNTIME_LIBRARY", "MultiThreadedDLL")
         .build();
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("cargo:rustc-link-lib=static=mfplayer");
 
     let bindings = bindgen::Builder::default()
-        .header("cpp/libs/mf/mfplayer.h")
+        .header("cpp/libs/mfplayer/mfplayer.h")
         .clang_args(["-xc++"])
         .vtable_generation(true)
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))

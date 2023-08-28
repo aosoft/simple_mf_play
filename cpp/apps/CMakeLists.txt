@@ -3,7 +3,7 @@ project(mfplayertest)
 
 set(CMAKE_CXX_STANDARD 17)
 
-include_directories(../libs/mf)
+include_directories(../libs/mfplayer)
 
 add_executable(mfplayertest WIN32 main.cpp main_window.cpp)
 
